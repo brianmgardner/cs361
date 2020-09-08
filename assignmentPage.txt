@@ -1,0 +1,34 @@
+CS361 Assignment 3
+Due: Friday, March 13, 2020 by midnight. Note that that's the Friday before Spring Break, so you may want to get this done early.
+
+Don't forget that you'll be zipping your Java implementation files and README.txt file together and submitting a single zip file for the main program, and a separate zip file if you also do the extra credit.
+
+Background:
+From Wikipedia: "Steganography is the art or practice of concealing a message, image, or file within another message, image, or file. The word steganography combines the ancient Greek words steganos meaning 'covered, concealed, or protected', and graphein meaning 'writing'. The first recorded use of the term was in 1499 by Johannes Trithemius in his Steganographia, a treatise on cryptography and steganography, disguised as a book on magic. Generally, the hidden messages will appear to be (or be part of) something else: images, articles, shopping lists, or some other cover text. For example, the hidden message may be in invisible ink between the visible lines of a private letter."
+In this assignment, you'll implement a simple steganographic algorithm by manipulating an image. In most modern image formats, there is ample "room" to hide a message. For example, the bmp format uses three bytes for each pixel in RGB format. Each byte indicates the intensity of the corresponding color (Red, Green, Blue). The following is an example of an image in this format: UT Picture. Your task is to take an image and hide a message in it. In practice, the resulting picture should not be visibly different from the original. You should also be able to recover the message from the modified image. Ideally, your program should be able to work on various image formats: bmp, png, jpeg. (I believe that the java library utilities for reading BufferedImages allow reading of multiple image formats, but I wouldn't swear to that.)
+
+Deliverables:
+You will be submitting your code electronically. Make sure that your code is well commented and follows good coding style. Clearly identify the members of your team (one or two people). Include a README file explaining how to run your program. Also, in your README file, address the issues I raise at the end of this file.
+The primary file name should be Steganography.java. Students are welcome to organize their assignments into multiple files and must submit those files as well. However, the main method must be in Steganography.java and the TAs should be able to compile your program with javac *.java.
+
+The Assignment
+Write code to perform the following steps:
+Read an image file. Some sample code to show how you might do this is here: Sample Java Code.
+Print statistics on the image: filename, number of pixels in the file, image height, and image width. (see the sample code)
+Input another file containing an ascii text message and generate a new image that is visually identical to the original image, but contains the hidden message. If the original was in a file named "xxxx.ext" the new file should be called "xxxx-steg.ext" That is, preserve the file extension, if any.
+Your code also should be able to extract the message from a modified image. Specify an output file name on the command line.
+Names of both the image file and message file should be passed on the command line. Additionally, a flag should be used to indicate whether you are encoding or decoding. For example, consider the following commands.
+Steganography -E image.png my-message
+Steganography -D image-steg.png my-message-out
+The first indicates encoding the contents of the ascii file my-message into the image in image.png. This should produce an image file named image-steg.png. The second line takes the modified image and extracts the hidden message. It puts it into a file called my-message-out.
+Hiding the Message:
+Each pixel in the image is represented by 24 bits of information. You can extract each of the RGB values from the pixel and store one bit of information in each. For example, suppose the pixel has RGB values of (126, 240, 122), and the next three bits you'd like to store are 1, 1, 0. The encoding scheme is as follows: If the bit you want to store is 0, make the corresponding byte even; if the bit is 1, make the byte odd. For example, the RGB triple above might store (1, 1, 0) by becoming (127, 241, 122). (On average, only half of the RGB values will change need to change, further reducing the visible effects.) Reading the bits is merely reading the even/odd-ness of successive RGB values. When you do change the parity, it doesn't seem important whether you raise or lower the value. But be careful not to decrement 0 or increment 255, as these may cause an error or make a much more visible change to the pixel. Notice also that, given this scheme, it may not be possible to recover the original image exactly from the modified image.
+Using this approach you can store the message in the image using 3 bits per pixel. Store a 0 byte to indicate the end of the message. If your input message is too long to store in the given image, you should store as much as you can. But be sure to allow enough room to store the final 0 byte; also print an error message to the terminal indicating that you've truncated the message. (Recall that you've already computed the number of pixels, so know how many bits of message the image can store.) I came up with this method off the top of my head. I don't see any reason why it shouldn't work; but please let me know if you do.
+
+In your README file, you should address the following:
+
+Comparing your original and modified images carefully, can you detect *any* difference visually (that is, in the appearance of the image)?
+Can you think of other ways you might hide the message in image files (or in other types of files)?
+Can you invent ways to increase the bandwidth of the channel?
+Suppose you were tasked to build an "image firewall" that would block images containing hidden messages. Could you do it? How might you approach this problem?
+Does this fit our definition of a covert channel? Explain your answer.
